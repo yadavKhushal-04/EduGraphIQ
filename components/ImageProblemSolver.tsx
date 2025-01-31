@@ -68,7 +68,7 @@ export function ImageProblemSolver() {
           <div>
             <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" id="image-upload" />
             <label htmlFor="image-upload">
-              <Button as="span" variant="outline">
+              <Button variant="outline">
                 <Upload className="mr-2 h-4 w-4" />
                 Upload Image
               </Button>
