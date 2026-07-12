@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
 import { Loader2 } from "lucide-react"
 import { generateText } from "ai"
-import { getOpenAIClient } from "@/utils/openai"
+import { askOpenAI } from "@/utils/openai"
 
 export function AIStudyPlanGenerator() {
   const [topic, setTopic] = useState("")
@@ -15,17 +15,13 @@ export function AIStudyPlanGenerator() {
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
-  const generatePlan = async (topic: string) => {
-    const openai = getOpenAIClient();
-    const completion = await openai.chat.completions.create({
-      messages: [{ 
-        role: "user", 
-        content: `Generate a study plan for: ${topic}` 
-      }],
-      model: "gpt-4",
-    });
-
-    return completion.choices[0].message.content || '';
+  const generatePlan = async (topic: string): Promise<string> => {
+    const result = await askOpenAI([
+      { role: "system", content: "You are a helpful tutor..." },
+      { role: "user", content: topic },
+    ])
+    const answer = result.choices?.[0]?.message?.content ?? ""
+    return answer
   }
 
   const generateStudyPlan = async () => {

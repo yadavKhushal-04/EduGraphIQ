@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
 import { Loader2, Upload } from "lucide-react"
 import { generateText } from "ai"
-import { getOpenAIClient } from "@/utils/openai"
+import { askOpenAI } from "@/utils/openai"
 
 export function AIQandA() {
   const [question, setQuestion] = useState("")
@@ -84,13 +84,11 @@ export function AIQandA() {
   }
 
   const generateAnswer = async (prompt: string) => {
-    const openai = getOpenAIClient();
-    const completion = await openai.chat.completions.create({
-      messages: [{ role: "user", content: prompt }],
-      model: "gpt-4",
-    });
-
-    setAnswer(completion.choices[0].message.content || '');
+    const result = await askOpenAI([
+      { role: "system", content: "You are a helpful tutor..." },
+      { role: "user", content: prompt },
+    ]);
+    const answer = result.choices[0].message.content;
   }
 
   return (

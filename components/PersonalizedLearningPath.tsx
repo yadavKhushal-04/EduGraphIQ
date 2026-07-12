@@ -3,15 +3,17 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/components/ui/use-toast"
 import { Loader2 } from "lucide-react"
-import { getOpenAIClient } from "@/utils/openai"
+import { askOpenAI } from "@/utils/openai"
 
 export function PersonalizedLearningPath() {
   const [learningPath, setLearningPath] = useState<string[]>([])
   const [currentStep, setCurrentStep] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
+  const [question, setQuestion] = useState("Create a personalized learning path for a beginner learning web development.")
   const { toast } = useToast()
 
   useEffect(() => {
@@ -21,16 +23,13 @@ export function PersonalizedLearningPath() {
   const generateLearningPath = async () => {
     setIsLoading(true)
     try {
-      const openai = getOpenAIClient();
-      const completion = await openai.chat.completions.create({
-        messages: [{ 
-          role: "user", 
-          content: "Generate a personalized learning path for a student studying mathematics. Provide a list of 5 steps or topics to master, starting from basic concepts and progressing to more advanced ones."
-        }],
-        model: "gpt-4",
-      });
+      const result = await askOpenAI([
+        { role: "system", content: "You are a helpful tutor..." },
+        { role: "user", content: question },
+      ]);
+      // const answer = result.choices[0].message.content
 
-      const steps = (completion.choices[0].message?.content || '').split("\n").filter((step) => step.trim() !== "")
+      const steps = (result.choices[0].message?.content || "").split("\n").filter((step: string) => step.trim() !== "")
       setLearningPath(steps)
       setCurrentStep(Number.parseInt(localStorage.getItem("currentLearningStep") || "0"))
     } catch (error) {
@@ -74,6 +73,15 @@ export function PersonalizedLearningPath() {
         <CardTitle>Personalized Learning Path</CardTitle>
       </CardHeader>
       <CardContent>
+        <Input
+          placeholder="Ask anything about your learning path"
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          className="mb-4"
+        />
+        <Button onClick={generateLearningPath} disabled={isLoading} className="mb-4">
+          {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Generate Path"}
+        </Button>
         <Progress value={(currentStep / (learningPath.length - 1)) * 100} className="mb-4" />
         <h3 className="font-semibold mb-2">
           Current Step: {currentStep + 1}/{learningPath.length}

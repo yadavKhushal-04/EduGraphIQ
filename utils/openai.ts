@@ -1,13 +1,11 @@
 import OpenAI from 'openai';
 
-export function getOpenAIClient() {
-  const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error("OpenAI API key is missing. Please check your .env file.");
-  }
-
-  return new OpenAI({
-    apiKey: apiKey,
-    dangerouslyAllowBrowser: true
-  });
-} 
+export async function askOpenAI(messages: any[], model = "gpt-4o") {
+  const res = await fetch("/api/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ messages, model }),
+  })
+  if (!res.ok) throw new Error("AI request failed")
+  return res.json()
+}

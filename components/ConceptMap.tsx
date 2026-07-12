@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
 import { generateText } from "ai"
-import { getOpenAIClient } from "@/utils/openai"
+import { askOpenAI } from "@/utils/openai"
 
 const conceptMap = {
   root: { title: "Mathematics", children: ["algebra", "geometry", "trigonometry", "calculus", "statistics"] },
@@ -119,16 +119,14 @@ export function ConceptMap({ className }: { className?: string }) {
     setSelectedConcept(concept)
 
     try {
-      const openai = getOpenAIClient()
-      const completion = await openai.chat.completions.create({
-        messages: [{ 
-          role: "user", 
-          content: `Provide a brief explanation of the mathematical concept: ${conceptMap[concept as keyof typeof conceptMap].title}. Keep it concise and suitable for a student learning about this topic.` 
-        }],
-        model: "gpt-4",
-      })
+      const result = await askOpenAI([
+        { role: "system", content: "You are a helpful tutor..." },
+        { role: "user", content: concept },
+      ]);
+      const text = result.choices[0].message.content || ''
 
-      const text = completion.choices[0].message?.content || ''
+
+      // const text = comp,letion.choices[0].message?.content || ''
       if (!text) {
         throw new Error("No explanation generated. The API response was empty.")
       }
@@ -172,16 +170,13 @@ export function ConceptMap({ className }: { className?: string }) {
   }
 
   const generateConcepts = async (topic: string) => {
-    const openai = getOpenAIClient()
-    const completion = await openai.chat.completions.create({
-      messages: [{ 
-        role: "user", 
-        content: `Generate concept map nodes for: ${topic}` 
-      }],
-      model: "gpt-4",
-    })
+    const result = await askOpenAI([
+      { role: "system", content: "You are a helpful tutor..." },
+      { role: "user", content: topic },
+    ])
+    const answer = result.choices[0].message.content
 
-    return completion.choices[0].message?.content || ''
+    return answer
   }
 
   return (

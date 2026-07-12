@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
 import { Loader2, Upload } from "lucide-react"
 import { generateText } from "ai"
-import { getOpenAIClient } from "@/utils/openai"
+import { askOpenAI } from "@/utils/openai"
 
 export function QuestionExploration() {
   const [questions, setQuestions] = useState<string[]>([])
@@ -27,16 +27,12 @@ export function QuestionExploration() {
     setIsLoading(true)
     setError(null)
     try {
-      const openai = getOpenAIClient();
-      const completion = await openai.chat.completions.create({
-        messages: [{ 
-          role: "user", 
-          content: "Generate 3 questions with numerical answers about linear equations, separated by '|'."
-        }],
-        model: "gpt-4",
-      });
+      const result = await askOpenAI([
+        { role: "system", content: "You are a helpful tutor..." },
+        { role: "user", content: question },
+      ]);
 
-      const generatedQuestions = (completion.choices[0].message?.content || '').split("|").map((q) => q.trim())
+      const generatedQuestions = (result.choices[0].message?.content || '').split("|").map((q) => q.trim())
       if (generatedQuestions.length === 0) {
         throw new Error("No questions were generated. Please try again.")
       }
@@ -52,7 +48,8 @@ export function QuestionExploration() {
     e.preventDefault()
     setIsLoading(true)
     setError(null)
-
+    
+    //need to fix this according to new changes
     try {
       const openai = getOpenAIClient();
       let prompt = `You are an AI tutor. The question is: "${questions[currentQuestionIndex]}" The student's answer is: "${userAnswer}" Provide brief feedback on the answer, and if it's incorrect, give a hint without revealing the full answer.`
