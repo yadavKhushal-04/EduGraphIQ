@@ -87,3 +87,13 @@ The process of respiration involves breathing, which includes inspiration and ex
 The rate of diffusion depends on the partial pressure gradients of oxygen and carbon dioxide, their solubility, and the thickness of the diffusion surface. In the human body, these factors facilitate the diffusion of oxygen from the alveoli to the deoxygenated blood and the removal of carbon dioxide from the blood to the alveoli, where it is exhaled out of the body.
 
 The respiratory system plays a crucial role in maintaining the overall health and function of the body by providing oxygen for cellular metabolism and removing harmful waste products, such as carbon dioxide. Overall, the human respiratory system is a complex and essential system that enables the body to obtain the oxygen it needs to function properly.
+
+
+
+
+
+
+
+
+
+## Valar Morghulis
